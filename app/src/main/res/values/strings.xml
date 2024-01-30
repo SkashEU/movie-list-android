@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MovieList</string>
+
+    <string name="title_movies">Movies</string>
+    <string name="title_tv_shows">TV Shows</string>
+    <string name="title_people">People</string>
 </resources>

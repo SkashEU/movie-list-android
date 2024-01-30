@@ -3,13 +3,25 @@ package com.skash.movielist
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.skash.movielist.core.navigation.NavigationAction
+import com.skash.movielist.core.navigation.NavigationGraph
 import com.skash.movielist.core.theme.MovieListTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,30 +29,61 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MovieListTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
+                MainScreenView()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun MainScreenView() {
+    val navController = rememberNavController()
+    Scaffold(
+        bottomBar = { MovieListBottomNavigation(navController) }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
+            NavigationGraph(navController = navController)
+        }
+    }
 }
+
+@Composable
+fun MovieListBottomNavigation(navController: NavController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    val items = listOf(
+        NavigationAction.Movies,
+        NavigationAction.People,
+        NavigationAction.TvShows
+    )
+
+    NavigationBar {
+        items.forEach { screen ->
+            NavigationBarItem(
+                icon = { Icon(painterResource(id = screen.icon), contentDescription = null) },
+                label = { Text(stringResource(id = screen.title)) },
+                selected = currentDestination?.route == screen.route,
+                onClick = {
+                    navController.navigate(screen.route) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     MovieListTheme {
-        Greeting("Android")
+        MainScreenView()
     }
 }
