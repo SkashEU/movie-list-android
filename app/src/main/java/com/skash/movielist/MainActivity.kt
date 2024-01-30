@@ -18,12 +18,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.skash.movielist.core.navigation.NavigationAction
 import com.skash.movielist.core.navigation.NavigationGraph
 import com.skash.movielist.core.theme.MovieListTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +70,7 @@ fun MovieListBottomNavigation(navController: NavController) {
             NavigationBarItem(
                 icon = { Icon(painterResource(id = screen.icon), contentDescription = null) },
                 label = { Text(stringResource(id = screen.title)) },
-                selected = currentDestination?.route == screen.route,
+                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                 onClick = {
                     navController.navigate(screen.route) {
                         launchSingleTop = true
